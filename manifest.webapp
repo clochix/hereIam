@@ -1,0 +1,30 @@
+{
+  "name": "hereIam",
+  "description": "Firefox OS application to share a geolocation",
+  "type": "privileged",
+  "version": "0.1",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "Clochix",
+    "url": "https://github.com/clochix/hereIam"
+  },
+  "permissions": {
+    "geolocation": {
+      "description": "Geo Location"
+    }
+  },
+  "activities": {
+    "clochix.geoloc": {
+      "href": "./index.html",
+      "disposition": "inline",
+      "returnValue": true
+    }
+  },
+  "default_locale": "en-US",
+  "icons": {
+    "30": "/style/icons/icon-30.png",
+    "60": "/style/icons/icon-60.png",
+    "90": "/style/icons/icon-90.png",
+    "128": "/style/icons/icon-128.png"
+  }
+}

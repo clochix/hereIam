@@ -1,0 +1,27 @@
+#locations {
+  list-style: none outside none;
+  margin: 0;
+  padding: 0;
+}
+#locations > li {
+  padding: 15px 5px;
+  border-color: #BBB;
+  border-style: solid;
+  border-width: 0 0 1px 0;
+}
+html, body, #main {
+  height: 100%;
+  font-size: 100%;
+}
+#map {
+  height: calc(100% - 70px);
+}
+#toggleSettings {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0.33rem;
+  font-size: 2rem;
+  z-index: 1001;
+  text-decoration: underline;
+}

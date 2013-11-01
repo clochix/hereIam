@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Map</title>
+    <link rel='stylesheet' href='style/common.css' type='text/css' />
+    <link rel='stylesheet' href='style/map.css' type='text/css' />
+    <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
+    <script src="lib/leaflet/leaflet.js"></script>
+    <script type="text/javascript" src="js/map.js"></script>
+  </head>
+  <body class="">
+    <span id="toggleSettings">=</span>
+    <section id="main">
+      <form>
+        <fieldset id="location" class="inline text">
+          <p>
+            <label for="location">Location</label>
+            <input type="text" name="location" placeholder="Location" />
+            <button type="reset"><span class="icon-remove">✗</span></button>
+            <button class="submit" name="go"> ? </button>
+          </p>
+        </fieldset>
+      </form>
+      <ul id="locations">
+      </ul>
+      <div id="map" class="hidden">
+      </div>
+    </section>
+    <section id="settings">
+      <p>Please enter a username to query the http://www.geonames.org API</p>
+      <form>
+        <fieldset id="username" class="inline text">
+          <p>
+            <label for="username">Username</label>
+            <input type="text" name="username" placeholder="Username" />
+            <button type="reset"><span class="icon-remove">✗</span></button>
+            <button class="submit" name="save"> ✓ </button>
+          </p>
+        </fieldset>
+        <button id="install">Install</button>
+      </form>
+    </section>
+  </body>
+</html>
