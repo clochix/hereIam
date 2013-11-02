@@ -93,8 +93,8 @@ function displayMap(lat, lng, zoom) {
         response = {
           coords: {
             latitude: e.latlng.lat,
-            longitude: e.latlng.lon,
-            accuracy: e.latlng.accuracy
+            longitude: e.latlng.lng,
+            accuracy: accuracy
           },
           timestamp: new Date()
         };
