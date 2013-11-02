@@ -1,8 +1,9 @@
 //jshint browser: true
 /*global L */
-var map,
+var map, circle,
     username,
-    currentGeoloc;
+    currentGeoloc,
+    aRequest;
 function $(sel) {
   "use strict";
   return document.querySelector.call(document, sel);
@@ -19,17 +20,6 @@ var utils = {
     "use strict";
     var params = Array.prototype.splice.call(arguments, 1);
     return (str.replace(/%s/g, function () {return params.shift(); }));
-  },
-  log: function log() {
-    "use strict";
-    var level    = arguments[arguments.length - 1],
-        levelNum = utils.logLevels.indexOf(level);
-    if (levelNum === -1) {
-      console.log("Unknown log level " + level);
-    }
-    if (levelNum >= utils.logLevels.indexOf(utils.logLevel)) {
-      console.log('[' + level + '] ' + utils.format.apply(utils, arguments));
-    }
   }
 };
 function qs(obj) {
@@ -60,17 +50,6 @@ function onLocations(response) {
     console.log(response);
     window.alert("Error calling Geoname: " + response.status.message);
   }
-  console.log(response);
-  /*
-  if (response.totalResultsCount > 0) {
-    var places = jQuery("#places");
-    places.empty();
-    response.geonames.forEach(function(e){
-      places.append(jQuery('<li><a class="place" property="georss:point" content="'+e.lat+' '+e.lng+'">' + e.name + ' ( ' + e.adminName1 + ' ) </a></li>'));
-    });
-    places.slideDown();
-  }
-  */
 }
 function getLocations(query, cb) {
   "use strict";
@@ -97,34 +76,37 @@ function displayMap(lat, lng, zoom) {
   map.setView([lat, lng], zoom || 14);
   L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>', maxZoom: 18}).addTo(map);
   map.on('contextmenu', function (e) {
-    window.alert("Lat, Lng : " + e.latlng.lat + ", " + e.latlng.lng);
+    var accuracy = document.getElementById('accuracy').value,
+        response;
     localStorage.setItem('currentGeoloc', JSON.stringify({lat: e.latlng.lat, lng: e.latlng.lng, zoom: map.getZoom()}));
+    if (circle) {
+      circle.setLatLng([e.latlng.lat, e.latlng.lng]);
+    } else {
+      circle = L.circle([e.latlng.lat, e.latlng.lng], accuracy, {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5
+      }).addTo(map);
+    }
+    if (aRequest) {
+      if (window.confirm("Send location ?")) {
+        response = {
+          coords: {
+            latitude: e.latlng.lat,
+            longitude: e.latlng.lon,
+            accuracy: e.latlng.accuracy
+          },
+          timestamp: new Date()
+        };
+        aRequest.postResult(response);
+      }
+    }
   });
   $('#map').classList.remove('hidden');
   localStorage.setItem('currentGeoloc', JSON.stringify({lat: lat, lng: lng, zoom: map.getZoom()}));
 }
-
-window.addEventListener('DOMContentLoaded', function () {
+function initEvents() {
   "use strict";
-  map = L.map('map');
-  username = localStorage.getItem('username');
-  if (username === null || username === '') {
-    document.getElementById('settings').classList.remove('hidden');
-    document.getElementById('main').classList.add('hidden');
-  } else {
-    $("#username [name=username]").value = username;
-    document.getElementById('settings').classList.add('hidden');
-    document.getElementById('main').classList.remove('hidden');
-  }
-  currentGeoloc = localStorage.getItem('currentGeoloc');
-  if (currentGeoloc !== null) {
-    try {
-      currentGeoloc = JSON.parse(currentGeoloc);
-      displayMap(currentGeoloc.lat, currentGeoloc.lng, currentGeoloc.zoom);
-    } catch (e) {}
-  } else {
-    document.getElementById('map').classList.add('hidden');
-  }
   listen("[name=save]", "click", function (event) {
     event.preventDefault();
     username = $("#username [name=username]").value;
@@ -157,15 +139,72 @@ window.addEventListener('DOMContentLoaded', function () {
     document.getElementById('settings').classList.toggle('hidden');
     document.getElementById('main').classList.toggle('hidden');
   });
-  listen("#install", "click", function (e) {
-    e.preventDefault();
-    var request = window.navigator.mozApps.install("http://clochix.net/public/hereIam/manifest.webapp");
-    request.onsuccess = function () {
-      alert('Installation successful!');
-    };
-    request.onerror = function () {
-      alert('Install failed, error: ' + this.error.name);
-    };
-    return false;
+  document.getElementById('accuracy').addEventListener('change', function (e) {
+    if (circle) {
+      circle.setRadius(this.value);
+    }
   });
+  function installable() {
+    var installButton = document.getElementById('install');
+    installButton.classList.remove('hidden');
+    installButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      var req = navigator.mozApps.install(manifestUrl);
+      req.onsuccess = function () {
+        alert('Installation successful!');
+      };
+      req.onerror = function () {
+        alert('Install failed, error: ' + this.error.name);
+      };
+      return false;
+    });
+  }
+  if (navigator.mozApps) {
+    var manifestUrl = "http://hereiam.clochix.net/manifest.webapp",
+        req = navigator.mozApps.checkInstalled(manifestUrl);
+    req.onsuccess = function () {
+      if (req.result === null) {
+        installable();
+      }
+    };
+    req.onerror = function () {
+      window.alert("Error checking if application is installed");
+      installable();
+    };
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  "use strict";
+  map = L.map('map');
+  username = localStorage.getItem('username');
+  if (username === null || username === '') {
+    document.getElementById('settings').classList.remove('hidden');
+    document.getElementById('main').classList.add('hidden');
+  } else {
+    $("#username [name=username]").value = username;
+    document.getElementById('settings').classList.add('hidden');
+    document.getElementById('main').classList.remove('hidden');
+  }
+  currentGeoloc = localStorage.getItem('currentGeoloc');
+  if (currentGeoloc !== null) {
+    try {
+      currentGeoloc = JSON.parse(currentGeoloc);
+      displayMap(currentGeoloc.lat, currentGeoloc.lng, currentGeoloc.zoom);
+    } catch (e) {}
+  } else {
+    document.getElementById('map').classList.add('hidden');
+  }
+  initEvents();
+  if (navigator.mozSetMessageHandler) {
+    navigator.mozSetMessageHandler('activity', function (activityRequest) {
+      var option = activityRequest.source;
+
+      if (option.name === "clochix.geoloc") {
+        aRequest = activityRequest;
+      } else {
+        activityRequest.postError("Invalid activity name");
+      }
+    });
+  }
 });

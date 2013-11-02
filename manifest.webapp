@@ -1,7 +1,7 @@
 {
   "name": "hereIam",
   "description": "Firefox OS application to share a geolocation",
-  "type": "privileged",
+  "type": "web",
   "version": "0.1",
   "launch_path": "/index.html",
   "developer": {
@@ -23,8 +23,10 @@
   "default_locale": "en-US",
   "icons": {
     "30": "/style/icons/icon-30.png",
+    "32": "/style/icons/icon-32.png",
     "60": "/style/icons/icon-60.png",
     "90": "/style/icons/icon-90.png",
+    "120": "/style/icons/icon-120.png",
     "128": "/style/icons/icon-128.png"
   }
 }

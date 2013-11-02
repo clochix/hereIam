@@ -34,7 +34,7 @@ fieldset.inline > p:hover {
 fieldset.inline > p > * {
   display: inline;
   margin: 0;
-  padding: 0.33rem;
+  padding: 0.2rem;
   width: auto;
   height: 2rem;
   background: #FFF;
@@ -48,6 +48,7 @@ fieldset.inline.text label {
   width: 3rem;
   max-width: 3rem;
   overflow: auto;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

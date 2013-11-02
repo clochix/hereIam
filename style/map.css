@@ -25,3 +25,11 @@ html, body, #main {
   z-index: 1001;
   text-decoration: underline;
 }
+#accuracy {
+  position: absolute;
+  bottom: 5px;;
+  left: 0;
+  width: 50%;
+  margin: 0 25%;
+  height: 1px;
+}
