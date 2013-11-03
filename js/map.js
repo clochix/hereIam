@@ -65,7 +65,11 @@ function getLocations(query, cb) {
   };
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
-      cb(JSON.parse(xhr.responseText));
+      try {
+        cb(JSON.parse(xhr.responseText));
+      } catch (e) {
+        window.alert("Error parsing response : " + e);
+      }
     }
   };
   xhr.open('GET', 'http://api.geonames.org/searchJSON?' + qs(options), true);

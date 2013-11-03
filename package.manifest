@@ -21,6 +21,7 @@
       "returnValue": true
     }
   },
+  "appcache_path": "/cache.manifest",
   "default_locale": "en-US",
   "icons": {
     "30": "/style/icons/icon-30.png",
