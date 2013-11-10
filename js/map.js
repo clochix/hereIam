@@ -78,7 +78,10 @@ function getLocations(query, cb) {
 function displayMap(lat, lng, zoom) {
   "use strict";
   map.setView([lat, lng], zoom || 14);
-  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>', maxZoom: 18}).addTo(map);
+  var tile = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>', maxZoom: 18});
+  tile.addTo(map);
+  // Force map redraw
+  map._onResize();
   map.on('contextmenu', function (e) {
     var accuracy = document.getElementById('accuracy').value,
         response;
